@@ -1,5 +1,6 @@
 Clear
-$ClientDomain = "blank"
+$ClientDomain = Read-Host "Are we on a client's domain? Y/N"
+If ($ClientDomain -ne "Y") {$ClientDomain = $False} Else {$ClientDomain = $True}
 $Client = New-Object -TypeName PSObject
 $Client | Add-Member -NotePropertyMembers @{DisplayName=""; PC=""; MSG=@(); AD=""; ADG=@()} -TypeName Asset
 $Admin = New-Object -TypeName PSObject
@@ -87,8 +88,6 @@ Function Global:Write-Notes {
 #Connect to Partner Center
 Function Global:Get-Started {
         Try {
-            $ClientDomain = Read-Host "Are we on a client's domain? Y/N"
-            If ($ClientDomain -ne "Y") {$ClientDomain = $False} Else {$ClientDomain = $True}
             Check-PSModules
             If (!(Get-PartnerContext)) {Connect-PartnerCenter ; Write-Host }
             Get-Client-Info
