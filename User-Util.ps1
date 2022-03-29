@@ -1,4 +1,4 @@
-﻿Clear
+Clear
 $ClientDomain = "blank"
 $Client = New-Object -TypeName PSObject
 $Client | Add-Member -NotePropertyMembers @{DisplayName=""; PC=""; MSG=@(); AD=""; ADG=@()} -TypeName Asset
@@ -9,6 +9,37 @@ $User | Add-Member -NotePropertyMembers @{DisplayName=""; PC=""; MS=""; MSG=""; 
 $ConnectedDomains = Get-MsolDomain -ErrorAction SilentlyContinue
 $AutoLocate = "blank"
 $AutoTicket = "blank"
+
+Function Global:Print-CMDs {
+Write-Host "Located the following commands for the utility:"
+Write-Host "-----------------------------------------------"
+Write-Host "  Print-CMDs"
+Write-Host "  Write-Notes"
+Write-Host "  Get-Started !"
+Write-Host "! Check-PSModules"
+Write-Host "! Get-Client-Info"
+Write-Host "! Get-User-Info"
+Write-Host "! Print-User"
+Write-Host "  Offboard-User *"
+Write-Host "* User-EXOMailbox-HideFromGAL"
+Write-Host "* User-EXOMailbox-Shared"
+Write-Host "* User-EXOMailbox-AddDelegate"
+Write-Host "* User-MS-ClearGroups"
+Write-Host "* User-MS-Disabled"
+Write-Host "  User-MS-Enabled"
+Write-Host "* User-MS-PWRandom"
+Write-Host "* User-MS-ResetMFA"
+Write-Host "* User-MS-DisableMFA"
+Write-Host "* User-MS-ClearLicenses"
+Write-Host "* User-AD-Description"
+Write-Host "* User-AD-Disabled"
+Write-Host "  User-AD-Enabled"
+Write-Host "* User-AD-PWRandom"
+Write-Host "* User-AD-ClearGroups"
+Write-Host "* User-AD-HideFromGAL"
+Write-Host "* User-AD-MvToRetntnOU"
+Write-Host "* Client-AD-DirSync"
+}
 
 Function Global:Write-Notes {
 <#
@@ -53,6 +84,21 @@ Function Global:Write-Notes {
 	}
 }
 
+#Connect to Partner Center
+Function Global:Get-Started {
+        Try {
+            $ClientDomain = Read-Host "Are we on a client's domain? Y/N"
+            If ($ClientDomain -ne "Y") {$ClientDomain = $False} Else {$ClientDomain = $True}
+            Check-PSModules
+            If (!(Get-PartnerContext)) {Connect-PartnerCenter ; Write-Host }
+            Get-Client-Info
+            Get-User-Info
+        }
+            Catch {
+            $Error[0]
+        }
+}
+
 Function Global:Check-PSModules {
 	Write-Host "Checking for required modules..."
 	ForEach ($Module in @("PowerShellGet","PartnerCenter","MSOnline","AzureAD","ExchangeOnlineManagement","Microsoft.Online.SharePoint.PowerShell","MicrosoftTeams")) {
@@ -71,20 +117,7 @@ Function Global:Check-PSModules {
     	}
 	Write-Host "Check-PSModules: Successful" -BackgroundColor White -ForegroundColor Blue ; Write-Host
 }
-#Connect to Partner Center
-Function Global:Get-Started {
-        Try {
-            $ClientDomain = Read-Host "Are we on a client's domain? Y/N"
-            If ($ClientDomain -ne "Y") {$ClientDomain = $False} Else {$ClientDomain = $True}
-            Check-PSModules
-            If (!(Get-PartnerContext)) {Connect-PartnerCenter ; Write-Host }
-            Get-Client-Info
-            Get-User-Info
-        }
-            Catch {
-            $Error[0]
-        }
-}
+
 #Connect to Microsoft Online
 #Connect to Exchange Online
 Function Global:Get-Client-Info {
@@ -474,31 +507,6 @@ Write-Host
 Write-Host "   As of:" $Now
 }
 
-Function Global:Print-CMDs {
-Write-Host "Located the following commands for the utility:"
-Write-Host "-----------------------------------------------"
-Write-Host "  Get-Started"
-Write-Host "  Offboard-User *"
-Write-Host "* User-EXOMailbox-HideFromGAL"
-Write-Host "* User-EXOMailbox-Shared"
-Write-Host "* User-EXOMailbox-AddDelegate"
-Write-Host "* User-MS-ClearGroups"
-Write-Host "* User-MS-Disabled"
-Write-Host "  User-MS-Enabled"
-Write-Host "* User-MS-PWRandom"
-Write-Host "* User-MS-ResetMFA"
-Write-Host "* User-MS-DisableMFA"
-Write-Host "* User-MS-ClearLicenses"
-Write-Host "* User-AD-Description"
-Write-Host "* User-AD-Disabled"
-Write-Host "  User-AD-Enabled"
-Write-Host "* User-AD-PWRandom"
-Write-Host "* User-AD-ClearGroups"
-Write-Host "* User-AD-HideFromGAL"
-Write-Host "* User-AD-MvToRetntnOU"
-Write-Host "* Client-AD-DirSync"
-}
-
 Function Global:Offboard-User {
         Try {
             User-EXOMailbox-HideFromGAL
@@ -852,5 +860,7 @@ Function Global:Client-AD-DirSync {
         $Error[0]
     }
 }
+
+Print-CMDs
 
 ### Danger, there be dragons (and unfinished, but contained code) ahead! ###
